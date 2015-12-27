@@ -13,7 +13,6 @@ extern "C"
 #include "lua.h"
 }
 
-#include <cstdint>
 #include <cassert>
 #include <cstring>
 
@@ -230,7 +229,7 @@ namespace
     }
 }
 
-extern "C" bool parseTable(lua_State *L, const char *data, size_t length)
+extern "C" int parseBinaryTable(lua_State *L, const char *data, size_t length)
 {
     StringTable strTable;
     BinaryReader reader(data, length);
@@ -242,6 +241,7 @@ extern "C" bool parseTable(lua_State *L, const char *data, size_t length)
         return false;
     }
     
+    int nReturns = lua_gettop(L) - strTable.index();
     lua_remove(L, strTable.index());
-    return true;
+    return nReturns;
 }

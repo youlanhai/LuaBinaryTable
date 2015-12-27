@@ -16,15 +16,17 @@ extern "C"
     
 #include "lua.h"
     
-bool parseTable(lua_State *L, const char *data, size_t length);
+int parseBinaryTable(lua_State *L, const char *data, size_t length);
     
 struct BinaryData
 {
     char *data;
     size_t length;
 };
-BinaryData* writeTable(lua_State*L, size_t &length);
+BinaryData* writeBinaryTable(lua_State*L, int nArgs);
 void freeBinaryData(BinaryData *p);
+
+int luaopen_BinaryTable(lua_State *L);
     
 #ifdef __cplusplus
 }

@@ -8,11 +8,39 @@
 
 #include "lua_binary_table.h"
 
-#include <cstdint>
-#include <cstring>
-#include <cstdlib>
-#include <algorithm>
-#include <cassert>
+extern "C"
+{
+#include "lauxlib.h"
+}
 
+static int luaParseBinaryTable(lua_State *L)
+{
+    size_t length;
+    const char *str = luaL_checklstring(L, 1, &length);
+    
+    return parseBinaryTable(L, str, length);
+}
 
+static int luaWriteBinaryTable(lua_State *L)
+{
+    BinaryData *ret = writeBinaryTable(L, lua_gettop(L));
+    if(!ret)
+    {
+        return 0;
+    }
+    lua_pushlstring(L, ret->data, ret->length);
+    freeBinaryData(ret);
+    return 1;
+}
+
+static const luaL_Reg binaryTableLib[] = {
+    "parse", luaParseBinaryTable,
+    "write", luaWriteBinaryTable,
+};
+
+extern "C" int luaopen_BinaryTable(lua_State *L)
+{
+    luaL_register(L, "BinaryTable", binaryTableLib);
+    return 1;
+}
 

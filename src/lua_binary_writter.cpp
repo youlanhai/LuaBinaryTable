@@ -255,11 +255,11 @@ namespace
         }
     }
     
-    int countTableLength(lua_State *L)
+    int countTableLength(lua_State *L, int index)
     {
         int n = 0;
         lua_pushnil(L);
-        while(lua_next(L, -2) != 0)
+        while(lua_next(L, index - 1) != 0)
         {
             lua_pop(L, 1); // pop the value.
             ++n;
@@ -268,9 +268,9 @@ namespace
         return n;
     }
     
-    bool writeValue(lua_State *L, StringTable &strTable, BinaryWriter &stream)
+    bool writeValue(lua_State *L, int index, StringTable &strTable, BinaryWriter &stream)
     {
-        int type = lua_type(L, -1);
+        int type = lua_type(L, index);
         switch (type)
         {
             case LUA_TNIL:
@@ -278,7 +278,7 @@ namespace
                 break;
                 
             case LUA_TBOOLEAN:
-                if(lua_toboolean(L, -1))
+                if(lua_toboolean(L, index))
                 {
                     stream.writeType(T_TRUE);
                 }
@@ -290,7 +290,7 @@ namespace
                 
             case LUA_TNUMBER:
             {
-                lua_Number v = lua_tonumber(L, -1);
+                lua_Number v = lua_tonumber(L, index);
                 lua_Number nearV = std::round(v);
                 
                 if(v == nearV)
@@ -305,7 +305,7 @@ namespace
             }
             case LUA_TSTRING:
             {
-                if(lua_strlen(L, -1) == 0)
+                if(lua_strlen(L, index) == 0)
                 {
                     stream.writeType(T_EMPTY_STRING);
                 }
@@ -320,7 +320,7 @@ namespace
                 
             case LUA_TTABLE:
             {
-                int length = countTableLength(L);
+                int length = countTableLength(L, index);
                 if(length == 0)
                 {
                     stream.writeType(T_EMPTY_TABLE);
@@ -333,7 +333,7 @@ namespace
                     for(int i = 1; i <= length; ++i)
                     {
                         lua_rawgeti(L, -1, i);
-                        if(!writeValue(L, strTable, stream))
+                        if(!writeValue(L, -1, strTable, stream))
                         {
                             return false;
                         }
@@ -350,13 +350,8 @@ namespace
                     lua_pushnil(L);
                     while(lua_next(L, -2) != 0)
                     {
-                        lua_pushvalue(L, -2); // duplicate the key at top.
-                        if(!writeValue(L, strTable, stream))
-                        {
-                            return false;
-                        }
-                        lua_pop(L, 1); // pop the duplicated key
-                        if(!writeValue(L, strTable, stream))
+                        if(!writeValue(L, -2, strTable, stream) ||
+                           !writeValue(L, -1, strTable, stream))
                         {
                             return false;
                         }
@@ -374,16 +369,20 @@ namespace
     }
 }
 
-extern "C" BinaryData* writeTable(lua_State*L, size_t &length)
+extern "C" BinaryData* writeBinaryTable(lua_State*L, int nArgs)
 {
     int top = lua_gettop(L);
     
     StringTable strTable(L);
     BinaryWriter dataWriter;
-    if(!writeValue(L, strTable, dataWriter))
+    
+    for(int i = -nArgs; i < 0; ++i)
     {
-        lua_settop(L, top);
-        return 0;
+        if(!writeValue(L, i, strTable, dataWriter))
+        {
+            lua_settop(L, top);
+            return 0;
+        }
     }
     
     BinaryWriter stream;
