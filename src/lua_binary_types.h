@@ -40,4 +40,5 @@ namespace LuaBinaryTable
     typedef uint32_t    TStringIndex;
 }
 
+
 #endif /* lua_binary_types_h */

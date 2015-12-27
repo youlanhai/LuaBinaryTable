@@ -76,6 +76,15 @@ namespace
         , size_(0)
         {}
         
+        void destroy(lua_State *L)
+        {
+            if(handle_ != 0)
+            {
+                lua_remove(L, handle_);
+                handle_ = 0;
+            }
+        }
+        
         bool getString(lua_State *L, int strIndex)
         {
             if(strIndex >=0 && strIndex < size_)
@@ -88,9 +97,9 @@ namespace
         
         bool parse(lua_State *L, BinaryReader &reader)
         {
-            handle_ = lua_gettop(L);
             size_ = (int)reader.readNumber<TStringIndex>();
             lua_createtable(L, size_, 0);
+            handle_ = lua_gettop(L);
             
             for(int i = 0; i < size_; ++i)
             {
@@ -112,7 +121,7 @@ namespace
             return true;
         }
         
-        int index() const { return handle_; }
+        int handle() const { return handle_; }
         int size() const { return size_; }
         
     private:
@@ -231,17 +240,21 @@ namespace
 
 extern "C" int parseBinaryTable(lua_State *L, const char *data, size_t length)
 {
+    int top = lua_gettop(L);
+    
     StringTable strTable;
     BinaryReader reader(data, length);
     
     if(!strTable.parse(L, reader) ||
        !parserValue(L, strTable, reader))
     {
-        lua_settop(L, strTable.index());
+        lua_settop(L, top);
         return false;
     }
     
-    int nReturns = lua_gettop(L) - strTable.index();
-    lua_remove(L, strTable.index());
+    strTable.destroy(L);
+    
+    int nReturns = lua_gettop(L) - top;
+    assert(nReturns == 0);
     return nReturns;
 }
