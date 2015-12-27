@@ -9,6 +9,8 @@
 #ifndef lua_binary_types_h
 #define lua_binary_types_h
 
+#include <cstdint>
+
 namespace LuaBinaryTable
 {
 
@@ -20,7 +22,8 @@ namespace LuaBinaryTable
         T_FALSE,
         T_ZERO,
         T_ONE,
-        T_EMPTY_STR,
+        T_EMPTY_STRING,
+        T_EMPTY_TABLE,
         T_INT8,
         T_INT16,
         T_INT32,
@@ -32,6 +35,9 @@ namespace LuaBinaryTable
         T_TABLE,
     };
 
+    typedef uint16_t    TTableLength;
+    typedef uint16_t    TStringLength;
+    typedef uint32_t    TStringIndex;
 }
 
 #endif /* lua_binary_types_h */

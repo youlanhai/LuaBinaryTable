@@ -17,8 +17,9 @@ extern "C"
 #include <cassert>
 #include <cstring>
 
-namespace LuaBinaryTable
+namespace
 {
+    using namespace LuaBinaryTable;
     
     class BinaryReader
     {
@@ -80,7 +81,7 @@ namespace LuaBinaryTable
         {
             if(strIndex >=0 && strIndex < size_)
             {
-                lua_rawgeti(L, handle_, strIndex + 1);
+                lua_rawgeti(L, handle_, strIndex);
                 return true;
             }
             return false;
@@ -89,12 +90,12 @@ namespace LuaBinaryTable
         bool parse(lua_State *L, BinaryReader &reader)
         {
             handle_ = lua_gettop(L);
-            size_ = (int)reader.readNumber<uint32_t>();
+            size_ = (int)reader.readNumber<TStringIndex>();
             lua_createtable(L, size_, 0);
             
             for(int i = 0; i < size_; ++i)
             {
-                size_t length = reader.readNumber<uint16_t>();
+                size_t length = reader.readNumber<TStringLength>();
                 if(length == 0)
                 {
                     return false;
@@ -145,8 +146,12 @@ namespace LuaBinaryTable
                 lua_pushnumber(L, 1);
                 break;
                 
-            case T_EMPTY_STR:
+            case T_EMPTY_STRING:
                 lua_pushlstring(L, "", 0);
+                break;
+                
+            case T_EMPTY_TABLE:
+                lua_newthread(L);
                 break;
                 
             case T_INT8:
@@ -175,7 +180,7 @@ namespace LuaBinaryTable
                 
             case T_STRING:
             {
-                int index = (int)reader.readNumber<uint32_t>();
+                int index = (int)reader.readNumber<TStringIndex>();
                 if(!strTable.getString(L, index))
                 {
                     return false;
@@ -185,7 +190,7 @@ namespace LuaBinaryTable
                 
             case T_ARRAY:
             {
-                int size = reader.readNumber<int>();
+                int size = (int)reader.readNumber<TTableLength>();
                 lua_createtable(L, size, 0);
                 for(int i = 0; i < size; ++i)
                 {
@@ -200,7 +205,7 @@ namespace LuaBinaryTable
                 
             case T_TABLE:
             {
-                int size = reader.readNumber<int>();
+                int size = (int)reader.readNumber<TTableLength>();
                 lua_createtable(L, 0, size);
                 for(int i = 0; i < size; ++i)
                 {
@@ -227,8 +232,8 @@ namespace LuaBinaryTable
 
 extern "C" bool parseTable(lua_State *L, const char *data, size_t length)
 {
-    LuaBinaryTable::StringTable strTable;
-    LuaBinaryTable::BinaryReader reader(data, length);
+    StringTable strTable;
+    BinaryReader reader(data, length);
     
     if(!strTable.parse(L, reader) ||
        !parserValue(L, strTable, reader))

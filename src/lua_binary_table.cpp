@@ -15,13 +15,4 @@
 #include <cassert>
 
 
-extern "C" BinaryData* writeTable(lua_State*L, size_t &length)
-{
-    return 0;
-}
 
-extern "C" void freeBinaryData(BinaryData *p)
-{
-    free(p->data);
-    delete p;
-}
