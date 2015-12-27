@@ -33,11 +33,12 @@ namespace LuaBinaryTable
         T_STRING,
         T_ARRAY,
         T_TABLE,
+        T_MAX,
     };
 
     typedef uint16_t    TTableLength;
     typedef uint16_t    TStringLength;
-    typedef uint32_t    TStringIndex;
+    typedef uint16_t    TStringIndex;
 }
 
 

@@ -11,6 +11,8 @@
 #include <climits>
 #include <cassert>
 
+#include <sys/time.h>
+
 #include "lua_binary_table.h"
 
 #include "lua_binary_reader.h"
@@ -184,6 +186,87 @@ void testBinaryTable(lua_State *L)
     freeBinaryData(data);
 }
 
+int64_t getTimeMs()
+{
+    timeval val;
+    gettimeofday(&val, 0);
+    
+    return int64_t(val.tv_sec) * 1000 + val.tv_usec / 1000;
+}
+
+bool readFile(std::string &data, const std::string &path)
+{
+    FILE *p = fopen(path.c_str(), "rb");
+    if(p == 0)
+    {
+        std::cout << "Failed to open file:" << path << std::endl;
+        return false;
+    }
+    
+    const size_t BLOCK_SIZE = 1024;
+    long offset = 0;
+    bool end = false;
+    do
+    {
+        data.resize(offset + BLOCK_SIZE);
+        size_t n = fread(&data[offset], 1, BLOCK_SIZE, p);
+        if(n < BLOCK_SIZE)
+        {
+            end = true;
+            data.resize(offset + n);
+        }
+        offset += n;
+    }while(!end);
+    return true;
+}
+
+void testEfficiency(lua_State *L)
+{
+    const int nTestCase = 100;
+    
+    std::string content;
+    if(!readFile(content, "d_skill.dat"))
+    {
+        return;
+    }
+    std::cout << "file size:" << content.size() << std::endl;
+
+    int64_t start = getTimeMs();
+    for(int i = 0; i < nTestCase; ++i)
+    {
+        assert(1 == parseBinaryTable(L, content.data(), content.size()));
+        lua_pop(L, 1);
+    }
+    int64_t end = getTimeMs();
+    std::cout << "parse binary use time: " << end - start << std::endl;
+    
+    if(!readFile(content, "d_skill.luo"))
+    {
+        return;
+    }
+    std::cout << "file size:" << content.size() << std::endl;
+    
+    lua_getfield(L, LUA_GLOBALSINDEX, "loadstring");
+    assert(lua_isfunction(L, -1));
+    lua_pushlstring(L, content.data(), content.size());
+    
+    start = getTimeMs();
+    for(int i = 0; i < nTestCase; ++i)
+    {
+        lua_pushvalue(L, -2); // loadstring
+        lua_pushvalue(L, -2); // content
+        assert(0 == lua_pcall(L, 1, 1, 0)); //loadstring(content)
+        assert(lua_isfunction(L, -1));
+        
+        assert(0 == lua_pcall(L, 0, 1, 0)); // execute the chunk
+        assert(lua_istable(L, -1));
+        
+        lua_pop(L, 1);
+    }
+    end = getTimeMs();
+    std::cout << "lua dostring use time:" << end - start << std::endl;
+}
+
 int main(int argc, char **argv)
 {
     testReaderWriter();
@@ -194,7 +277,8 @@ int main(int argc, char **argv)
     lua_pushcfunction(L, luaopen_BinaryTable);
     lua_call(L, 0, 0);
     
-    testBinaryTable(L);
+    //testBinaryTable(L);
+    testEfficiency(L);
     
     lua_close(L);
     return 0;

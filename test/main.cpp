@@ -34,13 +34,14 @@ int usage()
 
 int compressFile(lua_State *L, const std::string &srcFile, const std::string &dstFile)
 {
-    if(0  != luaL_loadfile(L, srcFile.c_str()))
+    if(0 != luaL_loadfile(L, srcFile.c_str()))
     {
         std::cout << "Failded to load lua file:" << srcFile << std::endl;
         return 0;
     }
     
-    if(0 != lua_pcall(L, 0, 1, 0))
+    lua_pushlstring(L, srcFile.c_str(), srcFile.length());
+    if(0 != lua_pcall(L, 1, 1, 0))
     {
         std::cout << "Failed to excute lua file:" << srcFile << "\n"
         << "error:" << lua_tostring(L, -1) << std::endl;
@@ -133,7 +134,7 @@ int main(int argc, char **argv)
         {
             dstFile.erase(pos);
         }
-        dstFile += ".bin";
+        dstFile += ".dat";
     }
     
     lua_State *L = lua_open();
