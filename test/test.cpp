@@ -81,16 +81,16 @@ void testBinaryTable(lua_State *L)
     lua_pushnumber(L, -128);
     lua_setfield(L, -2, "-int8");
     
-    lua_pushnumber(L, 0x7fff);
+    lua_pushnumber(L, std::numeric_limits<int16_t>::max());
     lua_setfield(L, -2, "int16");
     
-    lua_pushnumber(L, 0xffff);
+    lua_pushnumber(L, std::numeric_limits<int16_t>::min());
     lua_setfield(L, -2, "-int16");
     
-    lua_pushnumber(L, 0x7fffffff);
+    lua_pushnumber(L, std::numeric_limits<int>::max());
     lua_setfield(L, -2, "int32");
     
-    lua_pushnumber(L, 0xffffffff);
+    lua_pushnumber(L, std::numeric_limits<int>::min());
     lua_setfield(L, -2, "-int32");
     
     lua_pushnumber(L, 123456.789);
@@ -148,19 +148,19 @@ void testBinaryTable(lua_State *L)
     lua_pop(L, 1);
     
     lua_getfield(L, -1, "int16");
-    DO_TEST(lua_tonumber(L, -1) == 0x7fff);
+    DO_TEST(lua_tonumber(L, -1) == std::numeric_limits<int16_t>::max());
     lua_pop(L, 1);
     
     lua_getfield(L, -1, "-int16");
-    DO_TEST(lua_tonumber(L, -1) == 0xffff);
+    DO_TEST(lua_tonumber(L, -1) == std::numeric_limits<int16_t>::min());
     lua_pop(L, 1);
     
     lua_getfield(L, -1, "int32");
-    DO_TEST(lua_tonumber(L, -1) == 0x7fffffff);
+    DO_TEST(lua_tonumber(L, -1) == std::numeric_limits<int>::max());
     lua_pop(L, 1);
     
     lua_getfield(L, -1, "-int32");
-    DO_TEST(lua_tonumber(L, -1) == 0xffffffff);
+    DO_TEST(lua_tonumber(L, -1) == std::numeric_limits<int>::min());
     lua_pop(L, 1);
     
     lua_getfield(L, -1, "float");
