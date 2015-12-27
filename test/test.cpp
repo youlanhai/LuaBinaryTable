@@ -224,8 +224,9 @@ void testEfficiency(lua_State *L)
 {
     const int nTestCase = 100;
     
+    std::string path = "../../";
     std::string content;
-    if(!readFile(content, "d_skill.dat"))
+    if(!readFile(content, path + "d_skill.dat"))
     {
         return;
     }
@@ -240,7 +241,7 @@ void testEfficiency(lua_State *L)
     int64_t end = getTimeMs();
     std::cout << "parse binary use time: " << end - start << std::endl;
     
-    if(!readFile(content, "d_skill.luo"))
+    if(!readFile(content, path + "d_skill.luo"))
     {
         return;
     }
@@ -277,7 +278,7 @@ int main(int argc, char **argv)
     lua_pushcfunction(L, luaopen_BinaryTable);
     lua_call(L, 0, 0);
     
-    //testBinaryTable(L);
+    testBinaryTable(L);
     testEfficiency(L);
     
     lua_close(L);
