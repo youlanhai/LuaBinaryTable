@@ -38,14 +38,58 @@
 		DFEE95AC1C2F885400F4F575 /* lzio.c in Sources */ = {isa = PBXBuildFile; fileRef = DFEE958A1C2F885400F4F575 /* lzio.c */; };
 		DFEE95AD1C2F885400F4F575 /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = DFEE958C1C2F885400F4F575 /* Makefile */; };
 		DFEE95AE1C2F885400F4F575 /* print.c in Sources */ = {isa = PBXBuildFile; fileRef = DFEE958D1C2F885400F4F575 /* print.c */; };
-		DFEE95B21C2F889500F4F575 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DFEE95B11C2F889500F4F575 /* main.cpp */; };
 		DFEE95B51C2F89E600F4F575 /* lua_binary_table.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DFEE95B31C2F89E600F4F575 /* lua_binary_table.cpp */; };
 		DFEE95B71C2FB8C300F4F575 /* lua_binary_reader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DFEE95B61C2FB8C300F4F575 /* lua_binary_reader.cpp */; };
 		DFEE95BA1C2FB8DC00F4F575 /* lua_binary_writter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DFEE95B81C2FB8DC00F4F575 /* lua_binary_writter.cpp */; };
+		DFEE95C01C2FF5A400F4F575 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DFEE95B11C2F889500F4F575 /* main.cpp */; };
+		DFEE95C31C2FF5AF00F4F575 /* lua_binary_reader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DFEE95B61C2FB8C300F4F575 /* lua_binary_reader.cpp */; };
+		DFEE95C41C2FF5AF00F4F575 /* llex.c in Sources */ = {isa = PBXBuildFile; fileRef = DFEE95691C2F885400F4F575 /* llex.c */; };
+		DFEE95C61C2FF5AF00F4F575 /* loadlib.c in Sources */ = {isa = PBXBuildFile; fileRef = DFEE956F1C2F885400F4F575 /* loadlib.c */; };
+		DFEE95C71C2FF5AF00F4F575 /* ltablib.c in Sources */ = {isa = PBXBuildFile; fileRef = DFEE957E1C2F885400F4F575 /* ltablib.c */; };
+		DFEE95C81C2FF5AF00F4F575 /* liolib.c in Sources */ = {isa = PBXBuildFile; fileRef = DFEE95681C2F885400F4F575 /* liolib.c */; };
+		DFEE95C91C2FF5AF00F4F575 /* lstring.c in Sources */ = {isa = PBXBuildFile; fileRef = DFEE95791C2F885400F4F575 /* lstring.c */; };
+		DFEE95CA1C2FF5AF00F4F575 /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = DFEE958C1C2F885400F4F575 /* Makefile */; };
+		DFEE95CB1C2FF5AF00F4F575 /* lfunc.c in Sources */ = {isa = PBXBuildFile; fileRef = DFEE95631C2F885400F4F575 /* lfunc.c */; };
+		DFEE95CC1C2FF5AF00F4F575 /* lua_binary_table.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DFEE95B31C2F89E600F4F575 /* lua_binary_table.cpp */; };
+		DFEE95CD1C2FF5AF00F4F575 /* lstrlib.c in Sources */ = {isa = PBXBuildFile; fileRef = DFEE957B1C2F885400F4F575 /* lstrlib.c */; };
+		DFEE95CE1C2FF5AF00F4F575 /* lzio.c in Sources */ = {isa = PBXBuildFile; fileRef = DFEE958A1C2F885400F4F575 /* lzio.c */; };
+		DFEE95CF1C2FF5AF00F4F575 /* lapi.c in Sources */ = {isa = PBXBuildFile; fileRef = DFEE95561C2F885400F4F575 /* lapi.c */; };
+		DFEE95D01C2FF5AF00F4F575 /* lobject.c in Sources */ = {isa = PBXBuildFile; fileRef = DFEE95701C2F885400F4F575 /* lobject.c */; };
+		DFEE95D11C2FF5AF00F4F575 /* ltm.c in Sources */ = {isa = PBXBuildFile; fileRef = DFEE957F1C2F885400F4F575 /* ltm.c */; };
+		DFEE95D21C2FF5AF00F4F575 /* lgc.c in Sources */ = {isa = PBXBuildFile; fileRef = DFEE95651C2F885400F4F575 /* lgc.c */; };
+		DFEE95D31C2FF5AF00F4F575 /* lundump.c in Sources */ = {isa = PBXBuildFile; fileRef = DFEE95861C2F885400F4F575 /* lundump.c */; };
+		DFEE95D41C2FF5AF00F4F575 /* lauxlib.c in Sources */ = {isa = PBXBuildFile; fileRef = DFEE95581C2F885400F4F575 /* lauxlib.c */; };
+		DFEE95D51C2FF5AF00F4F575 /* ldump.c in Sources */ = {isa = PBXBuildFile; fileRef = DFEE95621C2F885400F4F575 /* ldump.c */; };
+		DFEE95D61C2FF5AF00F4F575 /* print.c in Sources */ = {isa = PBXBuildFile; fileRef = DFEE958D1C2F885400F4F575 /* print.c */; };
+		DFEE95D71C2FF5AF00F4F575 /* loslib.c in Sources */ = {isa = PBXBuildFile; fileRef = DFEE95741C2F885400F4F575 /* loslib.c */; };
+		DFEE95D81C2FF5AF00F4F575 /* ldo.c in Sources */ = {isa = PBXBuildFile; fileRef = DFEE95601C2F885400F4F575 /* ldo.c */; };
+		DFEE95D91C2FF5AF00F4F575 /* lopcodes.c in Sources */ = {isa = PBXBuildFile; fileRef = DFEE95721C2F885400F4F575 /* lopcodes.c */; };
+		DFEE95DA1C2FF5AF00F4F575 /* lbaselib.c in Sources */ = {isa = PBXBuildFile; fileRef = DFEE955A1C2F885400F4F575 /* lbaselib.c */; };
+		DFEE95DB1C2FF5AF00F4F575 /* linit.c in Sources */ = {isa = PBXBuildFile; fileRef = DFEE95671C2F885400F4F575 /* linit.c */; };
+		DFEE95DC1C2FF5AF00F4F575 /* lstate.c in Sources */ = {isa = PBXBuildFile; fileRef = DFEE95771C2F885400F4F575 /* lstate.c */; };
+		DFEE95DD1C2FF5AF00F4F575 /* lmem.c in Sources */ = {isa = PBXBuildFile; fileRef = DFEE956D1C2F885400F4F575 /* lmem.c */; };
+		DFEE95DE1C2FF5AF00F4F575 /* lua_binary_writter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DFEE95B81C2FB8DC00F4F575 /* lua_binary_writter.cpp */; };
+		DFEE95DF1C2FF5AF00F4F575 /* lcode.c in Sources */ = {isa = PBXBuildFile; fileRef = DFEE955B1C2F885400F4F575 /* lcode.c */; };
+		DFEE95E01C2FF5AF00F4F575 /* ldebug.c in Sources */ = {isa = PBXBuildFile; fileRef = DFEE955E1C2F885400F4F575 /* ldebug.c */; };
+		DFEE95E11C2FF5AF00F4F575 /* lmathlib.c in Sources */ = {isa = PBXBuildFile; fileRef = DFEE956C1C2F885400F4F575 /* lmathlib.c */; };
+		DFEE95E21C2FF5AF00F4F575 /* ltable.c in Sources */ = {isa = PBXBuildFile; fileRef = DFEE957C1C2F885400F4F575 /* ltable.c */; };
+		DFEE95E31C2FF5AF00F4F575 /* lvm.c in Sources */ = {isa = PBXBuildFile; fileRef = DFEE95881C2F885400F4F575 /* lvm.c */; };
+		DFEE95E41C2FF5AF00F4F575 /* ldblib.c in Sources */ = {isa = PBXBuildFile; fileRef = DFEE955D1C2F885400F4F575 /* ldblib.c */; };
+		DFEE95E51C2FF5AF00F4F575 /* lparser.c in Sources */ = {isa = PBXBuildFile; fileRef = DFEE95751C2F885400F4F575 /* lparser.c */; };
+		DFEE95EC1C2FF5F300F4F575 /* test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DFEE95BE1C2FF50600F4F575 /* test.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		DFEE94EE1C2F875800F4F575 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		DFEE95E71C2FF5AF00F4F575 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = /usr/share/man/man1/;
@@ -118,10 +162,21 @@
 		DFEE95B61C2FB8C300F4F575 /* lua_binary_reader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = lua_binary_reader.cpp; sourceTree = "<group>"; };
 		DFEE95B81C2FB8DC00F4F575 /* lua_binary_writter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = lua_binary_writter.cpp; sourceTree = "<group>"; };
 		DFEE95BB1C2FB90100F4F575 /* lua_binary_types.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lua_binary_types.h; sourceTree = "<group>"; };
+		DFEE95BC1C2FE8E500F4F575 /* lua_binary_reader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lua_binary_reader.h; sourceTree = "<group>"; };
+		DFEE95BD1C2FE95E00F4F575 /* lua_binary_writter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lua_binary_writter.h; sourceTree = "<group>"; };
+		DFEE95BE1C2FF50600F4F575 /* test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test.cpp; sourceTree = "<group>"; };
+		DFEE95EB1C2FF5AF00F4F575 /* LuaBinaryTableTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LuaBinaryTableTest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		DFEE94ED1C2F875800F4F575 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DFEE95E61C2FF5AF00F4F575 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -145,6 +200,7 @@
 			isa = PBXGroup;
 			children = (
 				DFEE94F01C2F875800F4F575 /* LuaBinaryTable */,
+				DFEE95EB1C2FF5AF00F4F575 /* LuaBinaryTableTest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -222,11 +278,13 @@
 		DFEE95AF1C2F887C00F4F575 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				DFEE95B61C2FB8C300F4F575 /* lua_binary_reader.cpp */,
+				DFEE95BC1C2FE8E500F4F575 /* lua_binary_reader.h */,
 				DFEE95B31C2F89E600F4F575 /* lua_binary_table.cpp */,
 				DFEE95B41C2F89E600F4F575 /* lua_binary_table.h */,
-				DFEE95B61C2FB8C300F4F575 /* lua_binary_reader.cpp */,
-				DFEE95B81C2FB8DC00F4F575 /* lua_binary_writter.cpp */,
 				DFEE95BB1C2FB90100F4F575 /* lua_binary_types.h */,
+				DFEE95B81C2FB8DC00F4F575 /* lua_binary_writter.cpp */,
+				DFEE95BD1C2FE95E00F4F575 /* lua_binary_writter.h */,
 			);
 			name = src;
 			path = ../src;
@@ -236,6 +294,7 @@
 			isa = PBXGroup;
 			children = (
 				DFEE95B11C2F889500F4F575 /* main.cpp */,
+				DFEE95BE1C2FF50600F4F575 /* test.cpp */,
 			);
 			name = test;
 			path = ../test;
@@ -259,6 +318,23 @@
 			name = LuaBinaryTable;
 			productName = LuaBinaryTable;
 			productReference = DFEE94F01C2F875800F4F575 /* LuaBinaryTable */;
+			productType = "com.apple.product-type.tool";
+		};
+		DFEE95C11C2FF5AF00F4F575 /* LuaBinaryTableTest */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DFEE95E81C2FF5AF00F4F575 /* Build configuration list for PBXNativeTarget "LuaBinaryTableTest" */;
+			buildPhases = (
+				DFEE95C21C2FF5AF00F4F575 /* Sources */,
+				DFEE95E61C2FF5AF00F4F575 /* Frameworks */,
+				DFEE95E71C2FF5AF00F4F575 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = LuaBinaryTableTest;
+			productName = LuaBinaryTable;
+			productReference = DFEE95EB1C2FF5AF00F4F575 /* LuaBinaryTableTest */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -288,6 +364,7 @@
 			projectRoot = "";
 			targets = (
 				DFEE94EF1C2F875800F4F575 /* LuaBinaryTable */,
+				DFEE95C11C2FF5AF00F4F575 /* LuaBinaryTableTest */,
 			);
 		};
 /* End PBXProject section */
@@ -299,6 +376,7 @@
 			files = (
 				DFEE95B71C2FB8C300F4F575 /* lua_binary_reader.cpp in Sources */,
 				DFEE959A1C2F885400F4F575 /* llex.c in Sources */,
+				DFEE95C01C2FF5A400F4F575 /* main.cpp in Sources */,
 				DFEE959D1C2F885400F4F575 /* loadlib.c in Sources */,
 				DFEE95A61C2F885400F4F575 /* ltablib.c in Sources */,
 				DFEE95991C2F885400F4F575 /* liolib.c in Sources */,
@@ -330,8 +408,49 @@
 				DFEE95A51C2F885400F4F575 /* ltable.c in Sources */,
 				DFEE95AB1C2F885400F4F575 /* lvm.c in Sources */,
 				DFEE95921C2F885400F4F575 /* ldblib.c in Sources */,
-				DFEE95B21C2F889500F4F575 /* main.cpp in Sources */,
 				DFEE95A11C2F885400F4F575 /* lparser.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DFEE95C21C2FF5AF00F4F575 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DFEE95C31C2FF5AF00F4F575 /* lua_binary_reader.cpp in Sources */,
+				DFEE95C41C2FF5AF00F4F575 /* llex.c in Sources */,
+				DFEE95C61C2FF5AF00F4F575 /* loadlib.c in Sources */,
+				DFEE95C71C2FF5AF00F4F575 /* ltablib.c in Sources */,
+				DFEE95C81C2FF5AF00F4F575 /* liolib.c in Sources */,
+				DFEE95C91C2FF5AF00F4F575 /* lstring.c in Sources */,
+				DFEE95CA1C2FF5AF00F4F575 /* Makefile in Sources */,
+				DFEE95CB1C2FF5AF00F4F575 /* lfunc.c in Sources */,
+				DFEE95CC1C2FF5AF00F4F575 /* lua_binary_table.cpp in Sources */,
+				DFEE95CD1C2FF5AF00F4F575 /* lstrlib.c in Sources */,
+				DFEE95CE1C2FF5AF00F4F575 /* lzio.c in Sources */,
+				DFEE95CF1C2FF5AF00F4F575 /* lapi.c in Sources */,
+				DFEE95D01C2FF5AF00F4F575 /* lobject.c in Sources */,
+				DFEE95D11C2FF5AF00F4F575 /* ltm.c in Sources */,
+				DFEE95D21C2FF5AF00F4F575 /* lgc.c in Sources */,
+				DFEE95D31C2FF5AF00F4F575 /* lundump.c in Sources */,
+				DFEE95D41C2FF5AF00F4F575 /* lauxlib.c in Sources */,
+				DFEE95D51C2FF5AF00F4F575 /* ldump.c in Sources */,
+				DFEE95D61C2FF5AF00F4F575 /* print.c in Sources */,
+				DFEE95D71C2FF5AF00F4F575 /* loslib.c in Sources */,
+				DFEE95D81C2FF5AF00F4F575 /* ldo.c in Sources */,
+				DFEE95D91C2FF5AF00F4F575 /* lopcodes.c in Sources */,
+				DFEE95DA1C2FF5AF00F4F575 /* lbaselib.c in Sources */,
+				DFEE95DB1C2FF5AF00F4F575 /* linit.c in Sources */,
+				DFEE95DC1C2FF5AF00F4F575 /* lstate.c in Sources */,
+				DFEE95DD1C2FF5AF00F4F575 /* lmem.c in Sources */,
+				DFEE95DE1C2FF5AF00F4F575 /* lua_binary_writter.cpp in Sources */,
+				DFEE95DF1C2FF5AF00F4F575 /* lcode.c in Sources */,
+				DFEE95E01C2FF5AF00F4F575 /* ldebug.c in Sources */,
+				DFEE95E11C2FF5AF00F4F575 /* lmathlib.c in Sources */,
+				DFEE95E21C2FF5AF00F4F575 /* ltable.c in Sources */,
+				DFEE95E31C2FF5AF00F4F575 /* lvm.c in Sources */,
+				DFEE95E41C2FF5AF00F4F575 /* ldblib.c in Sources */,
+				DFEE95EC1C2FF5F300F4F575 /* test.cpp in Sources */,
+				DFEE95E51C2FF5AF00F4F575 /* lparser.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -431,6 +550,20 @@
 			};
 			name = Release;
 		};
+		DFEE95E91C2FF5AF00F4F575 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		DFEE95EA1C2FF5AF00F4F575 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -448,6 +581,15 @@
 			buildConfigurations = (
 				DFEE94F81C2F875800F4F575 /* Debug */,
 				DFEE94F91C2F875800F4F575 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DFEE95E81C2FF5AF00F4F575 /* Build configuration list for PBXNativeTarget "LuaBinaryTableTest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DFEE95E91C2FF5AF00F4F575 /* Debug */,
+				DFEE95EA1C2FF5AF00F4F575 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

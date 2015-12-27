@@ -5,98 +5,67 @@
 //  Created by youlanhai on 15/12/27.
 //  Copyright © 2015年 youlanhai. All rights reserved.
 //
-#include "lua_binary_types.h"
+
+#include "lua_binary_writter.h"
 #include "lua_binary_table.h"
 
 #include <cstdlib>
-#include <cstring>
 #include <algorithm>
 #include <cmath>
 #include <climits>
 #include <cassert>
 
+namespace LuaBinaryTable
+{
+    BinaryWriter::BinaryWriter()
+    : data_(0)
+    , p_(0)
+    , end_(0)
+    {
+        
+    }
+    
+    void BinaryWriter::destroy()
+    {
+        free(data_);
+        data_ = p_ = end_ = 0;
+    }
+    
+    void BinaryWriter::reserve(size_t capacity)
+    {
+        if(capacity > this->capacity())
+        {
+            size_t size = this->size();
+            
+            if(data_ != nullptr)
+            {
+                data_ = (char*)std::realloc(data_, capacity);
+            }
+            else
+            {
+                data_ = (char*)std::malloc(capacity);
+            }
+            
+            p_ = data_ + size;
+            end_ = data_ + capacity;
+        }
+    }
+    
+    void BinaryWriter::ensure(size_t size)
+    {
+        if(p_ + size > end_)
+        {
+            size_t newCapacity = std::max(this->size() + size, capacity() << 1);
+            newCapacity = std::max((size_t)8, newCapacity);
+            reserve(newCapacity);
+        }
+    }
+}
+
 namespace
 {
     using namespace LuaBinaryTable;
     
-    class BinaryWriter
-    {
-    public:
-        BinaryWriter()
-        : data_(0)
-        , p_(0)
-        , end_(0)
-        {
-            
-        }
-        
-        void destroy()
-        {
-            free(data_);
-            data_ = p_ = end_ = 0;
-        }
-        
-        bool full() const { return p_ >= end_; }
-        size_t capacity() const { return end_ - data_; }
-        size_t size() const { return p_ - data_; }
-        const char *data() const { return data_; }
-        char* data() { return data_; }
-        
-        void reserve(size_t capacity)
-        {
-            if(capacity > this->capacity())
-            {
-                size_t size = this->size();
-                
-                if(data_ != nullptr)
-                {
-                    data_ = (char*)std::realloc(data_, capacity);
-                }
-                else
-                {
-                    data_ = (char*)std::malloc(capacity);
-                }
-                
-                p_ = data_ + size;
-                end_ = data_ + capacity;
-            }
-        }
-        
-        void ensure(size_t size)
-        {
-            if(p_ + size > end_)
-            {
-                size_t newCapacity = std::max(this->size() + size, capacity() << 1);
-                newCapacity = std::max((size_t)8, newCapacity);
-                reserve(newCapacity);
-            }
-        }
-        
-        template<typename T>
-        void writeNumber(T v)
-        {
-            ensure(sizeof(v));
-            memcpy(p_, &v, sizeof(T));
-            p_ += sizeof(T);
-        }
-        
-        void writeBytes(const char *data, size_t length)
-        {
-            ensure(length);
-            memcpy(p_, data, length);
-            p_ += length;
-        }
-        
-        void writeType(Type type)
-        {
-            writeNumber((uint8_t)type);
-        }
-        
-    private:
-        char*       data_;
-        char*       p_;
-        char*       end_;
-    };
     
     void writeInteger(BinaryWriter &stream, int64_t value)
     {

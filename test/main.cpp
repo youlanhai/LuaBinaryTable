@@ -7,9 +7,8 @@
 //
 
 #include <iostream>
-#include <cmath>
-#include <climits>
-#include <cassert>
+#include <string>
+#include <cstring>
 
 #include "lua_binary_table.h"
 
@@ -19,51 +18,137 @@ extern "C"
 #include "lualib.h"
 }
 
-void testBinaryTable(lua_State *L)
+const char *USAGE = "USAGE:\n"
+"LuaBinaryTable [-c][-d][-o output] file\n"
+"-c         compress mode\n"
+"-d         decompress mode\n"
+"-o output\n"
+"           output file name\n"
+;
+
+int usage()
 {
-    lua_newtable(L);
-    lua_pushstring(L, "Hello world!");
-    lua_setfield(L, -2, "string");
+    std::cout << USAGE << std::endl;
+    return 0;
+}
+
+int compressFile(lua_State *L, const std::string &srcFile, const std::string &dstFile)
+{
+    if(0  != luaL_loadfile(L, srcFile.c_str()))
+    {
+        std::cout << "Failded to load lua file:" << srcFile << std::endl;
+        return 0;
+    }
     
-    lua_pushnumber(L, 127);
-    lua_setfield(L, -2, "int8");
-    
-    lua_pushnumber(L, 123456.789);
-    lua_setfield(L, -2, "float");
-    
-    lua_pushboolean(L, true);
-    lua_setfield(L, -2, "true");
-    
-    lua_pushboolean(L, false);
-    lua_setfield(L, -2, "false");
+    if(0 != lua_pcall(L, 0, 1, 0))
+    {
+        std::cout << "Failed to excute lua file:" << srcFile << "\n"
+        << "error:" << lua_tostring(L, -1) << std::endl;
+        lua_pop(L, 1);
+        return 0;
+    }
     
     BinaryData *data = writeBinaryTable(L, 1);
-    assert(data);
+    lua_pop(L, 1);
     
-    std::cout << "binary: ";
-    for(int i = 0; i < data->length; ++i)
+    if(data == 0)
     {
-        std::cout << (int)data->data[i] << ", ";
-        if(i % 8 == 0)
-        {
-            std::cout << std::endl;
-        }
+        std::cout << "Failed to compress file:" << srcFile << std::endl;
+        return 0;
     }
-    std::cout << std::endl;
     
+    FILE *file = fopen(dstFile.c_str(), "wb");
+    if(file == 0)
+    {
+        std::cout << "Failed to create file:" << dstFile << std::endl;
+        return 0;
+    }
+    
+    fwrite(data->data, data->length, 1, file);
+    
+    fclose(file);
     freeBinaryData(data);
+    return 0;
+}
+
+int decompressFile()
+{
+    return 0;
 }
 
 int main(int argc, char **argv)
 {
+    if(argc < 2)
+    {
+        return usage();
+    }
+    
+    std::string srcFile;
+    std::string dstFile;
+    
+    bool compress = true;
+    
+    for(int i = 1; i < argc; ++i)
+    {
+        if(strcmp(argv[i], "-c") == 0)
+        {
+            compress = true;
+        }
+        else if(strcmp(argv[i], "-d") == 0)
+        {
+            compress = false;
+        }
+        else if(strcmp(argv[i], "-o") == 0)
+        {
+            if(i + 1 >= argc)
+            {
+                std::cout << "on output file." << std::endl;
+                return usage();
+            }
+            dstFile = argv[i + 1];
+        }
+        else if(srcFile.empty())
+        {
+            srcFile = argv[i];
+        }
+        else
+        {
+            std::cout << "invalid argument: " << argv[i]  << std::endl;
+            return usage();
+        }
+    }
+    
+    if(srcFile.empty())
+    {
+        std::cout << "no input file." << std::endl;
+        return usage();
+    }
+    
+    if(dstFile.empty())
+    {
+        dstFile = srcFile;
+        
+        size_t pos = dstFile.find_last_of("/\\.");
+        if(pos < dstFile.size() && dstFile[pos] == '.')
+        {
+            dstFile.erase(pos);
+        }
+        dstFile += ".bin";
+    }
+    
     lua_State *L = lua_open();
     luaL_openlibs(L);
     
-    lua_pushcfunction(L, luaopen_BinaryTable);
-    lua_call(L, 0, 0);
-    
-    testBinaryTable(L);
+    int ret = 0;
+    if(compress)
+    {
+        ret = compressFile(L, srcFile, dstFile);
+    }
+    else
+    {
+        ret = decompressFile();
+    }
     
     lua_close(L);
-    return 0;
+    return ret;
 }

@@ -7,6 +7,7 @@
 //
 
 #include "lua_binary_types.h"
+#include "lua_binary_reader.h"
 
 extern "C"
 {
@@ -14,59 +15,11 @@ extern "C"
 }
 
 #include <cassert>
-#include <cstring>
+
 
 namespace
 {
     using namespace LuaBinaryTable;
-    
-    class BinaryReader
-    {
-    public:
-        BinaryReader(const char *data, size_t length)
-        : data_(data)
-        , p_(data)
-        , end_(data + length)
-        {
-            
-        }
-        
-        template<typename T>
-        T readNumber()
-        {
-            T v = T(0);
-            if(p_ + sizeof(T) <= end_)
-            {
-                memcpy(&v, p_, sizeof(T));
-            }
-            p_ += sizeof(T);
-            return v;
-        }
-        
-        const char* readBytes(size_t &length)
-        {
-            if(p_ + length <= end_)
-            {
-                const char *ret = p_;
-                p_ += length;
-                return ret;
-            }
-            else
-            {
-                p_ = end_;
-                return 0;
-            }
-        }
-        
-        bool empty() const { return p_ >= end_; }
-        
-        
-    private:
-        const char*     data_;
-        const char*     p_;
-        const char*     end_;
-    };
-   
     
     class StringTable
     {
@@ -87,7 +40,7 @@ namespace
         
         bool getString(lua_State *L, int strIndex)
         {
-            if(strIndex >=0 && strIndex < size_)
+            if(strIndex >0 && strIndex <= size_)
             {
                 lua_rawgeti(L, handle_, strIndex);
                 return true;
@@ -217,7 +170,7 @@ namespace
                 lua_createtable(L, 0, size);
                 for(int i = 0; i < size; ++i)
                 {
-                    if(!parserValue(L, strTable, reader) &&
+                    if(!parserValue(L, strTable, reader) ||
                        !parserValue(L, strTable, reader))
                     {
                         return false;
@@ -249,12 +202,11 @@ extern "C" int parseBinaryTable(lua_State *L, const char *data, size_t length)
        !parserValue(L, strTable, reader))
     {
         lua_settop(L, top);
-        return false;
+        return 0;
     }
     
     strTable.destroy(L);
     
     int nReturns = lua_gettop(L) - top;
-    assert(nReturns == 0);
     return nReturns;
 }
