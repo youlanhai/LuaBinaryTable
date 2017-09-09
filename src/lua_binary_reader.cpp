@@ -40,7 +40,7 @@ namespace
         
         bool getString(lua_State *L, int strIndex)
         {
-            if(strIndex >0 && strIndex <= size_)
+            if(strIndex > 0 && strIndex <= size_)
             {
                 lua_rawgeti(L, handle_, strIndex);
                 return true;
@@ -50,7 +50,7 @@ namespace
         
         bool parse(lua_State *L, BinaryReader &reader)
         {
-            size_ = (int)reader.readNumber<TStringIndex>();
+            size_ = (int)reader.readNumber<TStringPoolLength>();
             lua_createtable(L, size_, 0);
             handle_ = lua_gettop(L);
             
@@ -121,18 +121,6 @@ namespace
         return true;
     }
     
-    bool _parseEmptyString(lua_State *L, StringTable &strTable, BinaryReader &reader)
-    {
-        lua_pushlstring(L, "", 0);
-        return true;
-    }
-    
-    bool _parseEmptyTable(lua_State *L, StringTable &strTable, BinaryReader &reader)
-    {
-        lua_newtable(L);
-        return true;
-    }
-
     bool _parseInt8(lua_State *L, StringTable &strTable, BinaryReader &reader)
     {
         lua_pushnumber(L, (lua_Number)reader.readNumber<int8_t>());
@@ -168,37 +156,52 @@ namespace
         lua_pushnumber(L, (lua_Number)reader.readNumber<double>());
         return true;
     }
+    
+    bool _parseString0(lua_State *L, StringTable &strTable, BinaryReader &reader)
+    {
+        lua_pushlstring(L, "", 0);
+        return true;
+    }
+    
+    bool _parseTable0(lua_State *L, StringTable &strTable, BinaryReader &reader)
+    {
+        lua_newtable(L);
+        return true;
+    }
 
+    template <typename T>
     bool _parseString(lua_State *L, StringTable &strTable, BinaryReader &reader)
     {
-        int index = (int)reader.readNumber<TStringIndex>();
-        if(!strTable.getString(L, index))
+        size_t index = (size_t)reader.readNumber<T>();
+        if(!strTable.getString(L, (int)index))
         {
             return false;
         }
         return true;
     }
 
+    template <typename T>
     bool _parseArray(lua_State *L, StringTable &strTable, BinaryReader &reader)
     {
-        int size = (int)reader.readNumber<TTableLength>();
-        lua_createtable(L, size, 0);
-        for(int i = 0; i < size; ++i)
+        size_t size = (size_t)reader.readNumber<T>();
+        lua_createtable(L, (int)size, 0);
+        for(size_t i = 0; i < size; ++i)
         {
             if(!parserValue(L, strTable, reader))
             {
                 return false;
             }
-            lua_rawseti(L, -2, i + 1);
+            lua_rawseti(L, -2, (int)i + 1);
         }
         return true;
     }
 
+    template <typename T>
     bool _parseTable(lua_State *L, StringTable &strTable, BinaryReader &reader)
     {
-        int size = (int)reader.readNumber<TTableLength>();
-        lua_createtable(L, 0, size);
-        for(int i = 0; i < size; ++i)
+        size_t size = (size_t)reader.readNumber<T>();
+        lua_createtable(L, 0, (int)size);
+        for(size_t i = 0; i < size; ++i)
         {
             if(!parserValue(L, strTable, reader) ||
                !parserValue(L, strTable, reader))
@@ -217,22 +220,35 @@ namespace
         _parseFalse,
         _parseZero,
         _parseOne,
-        _parseEmptyString,
-        _parseEmptyTable,
         _parseInt8,
         _parseInt16,
         _parseInt32,
         _parseInt64,
         _parseFloat,
         _parseDouble,
-        _parseString,
-        _parseArray,
-        _parseTable,
+        _parseString0,
+        _parseString<uint8_t>,
+        _parseString<uint16_t>,
+        _parseString<uint32_t>,
+        _parseTable0,
+        _parseArray<uint8_t>,
+        _parseArray<uint16_t>,
+        _parseArray<uint32_t>,
+        _parseTable0,
+        _parseTable<uint8_t>,
+        _parseTable<uint16_t>,
+        _parseTable<uint32_t>,
     };
     
     bool parserValue(lua_State *L, StringTable &strTable, BinaryReader &reader)
     {
-        int type = (int)reader.readNumber<uint8_t>();
+        assert(parsers[T_MAX - 1] != 0);
+        uint8_t type = reader.readNumber<uint8_t>();
+        if(type >= T_MAX)
+        {
+            return false;
+        }
+        
         return parsers[type](L, strTable, reader);
     }
 }

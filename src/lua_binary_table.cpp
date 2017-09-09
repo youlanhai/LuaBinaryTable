@@ -13,7 +13,7 @@ extern "C"
 #include "lauxlib.h"
 }
 
-static int luaParseBinaryTable(lua_State *L)
+static int LuaBinaryTable_parse(lua_State *L)
 {
     size_t length;
     const char *str = luaL_checklstring(L, 1, &length);
@@ -21,7 +21,7 @@ static int luaParseBinaryTable(lua_State *L)
     return parseBinaryTable(L, str, length);
 }
 
-static int luaWriteBinaryTable(lua_State *L)
+static int LuaBinaryTable_write(lua_State *L)
 {
     BinaryData *ret = writeBinaryTable(L, lua_gettop(L));
     if(!ret)
@@ -33,9 +33,72 @@ static int luaWriteBinaryTable(lua_State *L)
     return 1;
 }
 
+static int LuaBinaryTable_parseFromFile(lua_State *L)
+{
+    const char *filename = luaL_checkstring(L, 1);
+    FILE *fp = fopen(filename, "rb");
+    if(!fp)
+    {
+        lua_pushnil(L);
+        lua_pushstring(L, "Failed open input file.");
+        return 2;
+    }
+    
+    fseek(fp, 0, SEEK_END);
+    long length = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
+    
+    char* buffer = new char[length];
+    fread(buffer, length, 1, fp);
+    
+    int ret = parseBinaryTable(L, buffer, length);
+    fclose(fp);
+    
+    if(ret == 0)
+    {
+        lua_pushnil(L);
+        lua_pushstring(L, "Failed parse data");
+        return 2;
+    }
+    
+    return 1;
+}
+
+static int LuaBinaryTable_writeToFile(lua_State *L)
+{
+    const char *filename = luaL_checkstring(L, 1);
+    
+    BinaryData *ret = writeBinaryTable(L, lua_gettop(L) - 1);
+    if(!ret)
+    {
+        lua_pushboolean(L, 0);
+        lua_pushstring(L, "Failed to serialize data.");
+        return 2;
+    }
+    
+    FILE *fp = fopen(filename, "wb");
+    if(!fp)
+    {
+        freeBinaryData(ret);
+        
+        lua_pushboolean(L, 0);
+        lua_pushstring(L, "Failed open input file.");
+        return 2;
+    }
+    
+    fwrite(ret->data, ret->length, 1, fp);
+    fclose(fp);
+    
+    lua_pushboolean(L, 1);
+    return 1;
+}
+
 static const luaL_Reg binaryTableLib[] = {
-    "parse", luaParseBinaryTable,
-    "write", luaWriteBinaryTable,
+    {"parse", LuaBinaryTable_parse},
+    {"write", LuaBinaryTable_write},
+    {"parseFromFile", LuaBinaryTable_parseFromFile},
+    {"writeToFile", LuaBinaryTable_writeToFile},
+    {0, 0},
 };
 
 extern "C" int luaopen_BinaryTable(lua_State *L)

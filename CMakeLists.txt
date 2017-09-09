@@ -52,12 +52,13 @@ add_library(${TARGET_NAME} ${SOURCE_FILES})
 set(TARGET_NAME LuaBinaryTable)
 
 set(SOURCE_FILES 
+	src/lua_binary_types.h
 	src/lua_binary_reader.h
 	src/lua_binary_reader.cpp
 	src/lua_binary_table.h
 	src/lua_binary_table.cpp
-	src/lua_binary_writer.h
-	src/lua_binary_writer.cpp
+	src/lua_binary_writter.h
+	src/lua_binary_writter.cpp
 )
 
 include_directories(${LUA_PATH})
@@ -67,7 +68,7 @@ add_library(${TARGET_NAME} ${SOURCE_FILES})
 ######################################################################
 ## test
 ######################################################################
-set(TARGET_NAME test)
+set(TARGET_NAME ltest)
 
 include_directories(${LUA_PATH} src)
 

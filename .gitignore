@@ -30,4 +30,4 @@
 xcuserdata/
 project.xcworkspace/
 Intermediates/
-bin/
+/build/

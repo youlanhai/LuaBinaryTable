@@ -9,6 +9,7 @@
 #ifndef lua_binary_reader_h
 #define lua_binary_reader_h
 
+#include "lua_binary_types.h"
 #include <cstring>
 
 namespace LuaBinaryTable
@@ -17,8 +18,7 @@ namespace LuaBinaryTable
     {
     public:
         BinaryReader(const char *data, size_t length)
-        : data_(data)
-        , p_(data)
+        : p_(data)
         , end_(data + length)
         {
             
@@ -53,9 +53,12 @@ namespace LuaBinaryTable
         
         bool empty() const { return p_ >= end_; }
         
+        Type readType()
+        {
+            return (Type)readNumber<uint8_t>();
+        }
         
     private:
-        const char*     data_;
         const char*     p_;
         const char*     end_;
     };

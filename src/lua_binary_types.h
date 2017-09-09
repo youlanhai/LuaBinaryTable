@@ -22,23 +22,29 @@ namespace LuaBinaryTable
         T_FALSE,
         T_ZERO,
         T_ONE,
-        T_EMPTY_STRING,
-        T_EMPTY_TABLE,
         T_INT8,
         T_INT16,
         T_INT32,
         T_INT64,
         T_FLOAT,
         T_DOUBLE,
-        T_STRING,
-        T_ARRAY,
-        T_TABLE,
+        T_STRING0,
+        T_STRING8,
+        T_STRING16,
+        T_STRING32,
+        T_ARRAY0,
+        T_ARRAY8,
+        T_ARRAY16,
+        T_ARRAY32,
+        T_TABLE0,
+        T_TABLE8,
+        T_TABLE16,
+        T_TABLE32,
         T_MAX,
     };
 
-    typedef uint16_t    TTableLength;
     typedef uint16_t    TStringLength;
-    typedef uint16_t    TStringIndex;
+    typedef uint32_t    TStringPoolLength;
 }
 
 
