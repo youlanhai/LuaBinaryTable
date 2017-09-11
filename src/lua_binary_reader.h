@@ -27,13 +27,27 @@ namespace LuaBinaryTable
         template<typename T>
         T readNumber()
         {
-            T v = T(0);
+            T v = (T)0;
             if(p_ + sizeof(T) <= end_)
             {
                 memcpy(&v, p_, sizeof(T));
             }
             p_ += sizeof(T);
             return v;
+        }
+        
+        template<typename T>
+        void readNumber(T &v)
+        {
+            if(p_ + sizeof(T) <= end_)
+            {
+                memcpy(&v, p_, sizeof(T));
+            }
+            else
+            {
+                v = T(0);
+            }
+            p_ += sizeof(T);
         }
         
         const char* readBytes(size_t length)
@@ -62,6 +76,7 @@ namespace LuaBinaryTable
         const char*     p_;
         const char*     end_;
     };
+
 }
 
 #endif /* lua_binary_reader_h */

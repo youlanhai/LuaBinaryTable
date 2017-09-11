@@ -175,9 +175,8 @@ void testBinaryTable(lua_State *L)
 #else
     saveFile("test.dat", data->data, data->length);
 #endif
-    
     DO_TEST(1 == parseBinaryTable(L, data->data, data->length));
-    
+
     lua_getfield(L, -1, "string");
     DO_TEST(strcmp(lua_tostring(L, -1), "Hello world!") == 0);
     lua_pop(L, 1);
@@ -242,7 +241,7 @@ void testEfficiency(lua_State *L, const char *binaryTablePath, const char *luaBi
     std::cout << "Test Efficiency: " << binaryTablePath << " vs " << luaBinaryPath << std::endl;
 
     std::string content;
-    const int nTestCase = 100;
+    const int nTestCase = 1000;
     int64_t start, end;
     
     // load binary table
@@ -256,8 +255,12 @@ void testEfficiency(lua_State *L, const char *binaryTablePath, const char *luaBi
     start = getTimeMs();
     for(int i = 0; i < nTestCase; ++i)
     {
-        assert(1 == parseBinaryTable(L, content.c_str(), content.length()));
-        lua_pop(L, 1);
+        int ret = parseBinaryTable(L, content.c_str(), content.length());
+        assert(1 == ret);
+        if(ret)
+        {
+            lua_pop(L, 1);
+        }
     }
     end = getTimeMs();
     std::cout << "parse binary use time: " << end - start << std::endl;
@@ -281,10 +284,12 @@ void testEfficiency(lua_State *L, const char *binaryTablePath, const char *luaBi
     {
         lua_pushvalue(L, -2); // loadstring
         lua_pushvalue(L, -2); // content
-        assert(0 == lua_pcall(L, 1, 1, 0)); //loadstring(content)
+        int ret = lua_pcall(L, 1, 1, 0);
+        assert(0 == ret); //loadstring(content)
         assert(lua_isfunction(L, -1) && "Invalid input file");
         
-        assert(0 == lua_pcall(L, 0, 1, 0)); // execute the chunk
+        ret = lua_pcall(L, 0, 1, 0);
+        assert(0 == ret); // execute the chunk
         assert(lua_istable(L, -1) && "Invalid input file");
         
         lua_pop(L, 1);

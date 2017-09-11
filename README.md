@@ -1,8 +1,26 @@
 # LuaBinaryTable
 Compress a Lua table into binary data file.
 
-## NOTICE
-The efficiency was not obvious, if you have any good idea, please contact me.  
-此工具可将Lua Table压缩成二进制格式，压缩后的文件大小要比`luac -s`预编译之后的大小要小很多。但是经过zip再次压缩之后，大小相差甚小。
-原以为解析速度会比lua解释器快，但是实测之后发现反而要慢一点(o(╯□╰)o)。  
-所以，此工程实则无用。但是代码已经写完了，感兴趣的朋友可以提供一些优化方案。
+将Lua的table压缩成二进制数据文件
+
+# 测试结果对比
+Release模式下，解析bin/d_skill.lua文件1000次的对比结果
+
+模式      |   文件大小(byte)   |   解析耗时(ms)
+----------|------------------|-----------
+LuaBinaryTable | 380341      |  3427
+Lua       |     402701       |  3521
+
+# 编译&运行测试程序
+安装cmake
+
+```shell
+mkdir build
+cd build
+cmake -DCMAKE_INSTALL_PREFIX=".." -DCMAKE_BUILD_TYPE=Release ..
+make
+make install
+
+cd ../bin
+./run-test.sh
+```
