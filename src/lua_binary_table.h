@@ -23,7 +23,7 @@ struct BinaryData
     char *data;
     size_t length;
 };
-BinaryData* writeBinaryTable(lua_State*L, int nArgs);
+BinaryData* writeBinaryTable(lua_State*L, int idx);
 void freeBinaryData(BinaryData *p);
 
 int luaopen_BinaryTable(lua_State *L);

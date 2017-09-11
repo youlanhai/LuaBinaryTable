@@ -148,7 +148,7 @@ namespace
             handle_ = 0;
         }
         
-        int storeString(lua_State *L, int idx)
+        size_t storeString(lua_State *L, int idx)
         {
             assert(lua_type(L, idx) == LUA_TSTRING);
             
@@ -161,17 +161,17 @@ namespace
                 cacheSize_ += lua_strlen(L, idx);
                 
                 lua_pushvalue(L, idx);
-                lua_pushnumber(L, size_);
+                lua_pushinteger(L, size_);
                 lua_rawset(L, handle_);
                 
                 lua_pushvalue(L, idx);
-                lua_rawseti(L, index2string_, size_);
+                lua_rawseti(L, index2string_, (int)size_);
                 
                 return size_;
             }
             else
             {
-                int index = lua_tonumber(L, -1);
+                size_t index = (size_t)lua_tointeger(L, -1);
                 lua_pop(L, 1);
                 return index;
             }
@@ -180,9 +180,9 @@ namespace
         void write(lua_State *L, BinaryWriter &stream) const
         {
             stream.writeNumber((TStringPoolLength)size_);
-            for(int i = 1; i <= size_; ++i)
+            for(size_t i = 1; i <= size_; ++i)
             {
-                lua_rawgeti(L, index2string_, i);
+                lua_rawgeti(L, index2string_, (int)i);
                 
                 size_t length;
                 const char *str = lua_tolstring(L, -1, &length);
@@ -198,7 +198,7 @@ namespace
     private:
         int     handle_;
         int     index2string_;
-        int     size_;
+        size_t  size_;
         size_t  cacheSize_;
     };
     
@@ -291,7 +291,7 @@ namespace
                 }
                 else
                 {
-                    size_t strIndex = (size_t)strTable.storeString(L, index);
+                    size_t strIndex = strTable.storeString(L, index);
                     assert(strIndex != 0);
                     writeLength(stream, T_STRING0, strIndex);
                 }
@@ -345,23 +345,24 @@ namespace
     }
 }
 
-extern "C" BinaryData* writeBinaryTable(lua_State*L, int nArgs)
+extern "C" BinaryData* writeBinaryTable(lua_State*L, int idx)
 {
     int top = lua_gettop(L);
+    if(idx < 0)
+    {
+        idx = top + idx + 1;
+    }
     
     StringTable strTable(L);
     BinaryWriter dataWriter;
     
-    for(int i = nArgs; i > 0; --i)
+    if(!writeValue(L, idx, strTable, dataWriter))
     {
-        if(!writeValue(L, top - i + 1, strTable, dataWriter))
-        {
-            lua_settop(L, top);
-            
-            strTable.destroy(L);
-            dataWriter.destroy();
-            return 0;
-        }
+        lua_settop(L, top);
+        
+        strTable.destroy(L);
+        dataWriter.destroy();
+        return 0;
     }
     
     BinaryWriter stream;

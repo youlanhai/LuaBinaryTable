@@ -49,14 +49,13 @@ int compressFile(lua_State *L, const std::string &srcFile, const std::string &ds
         return 0;
     }
     
-    BinaryData *data = writeBinaryTable(L, 1);
-    lua_pop(L, 1);
-    
+    BinaryData *data = writeBinaryTable(L, -1);
     if(data == 0)
     {
         std::cout << "Failed to compress file:" << srcFile << std::endl;
         return 0;
     }
+    lua_pop(L, 1);
     
     FILE *file = fopen(dstFile.c_str(), "wb");
     if(file == 0)
@@ -107,6 +106,7 @@ int main(int argc, char **argv)
                 return usage();
             }
             dstFile = argv[i + 1];
+            ++i;
         }
         else if(srcFile.empty())
         {

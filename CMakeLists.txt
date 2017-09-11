@@ -46,6 +46,14 @@ set(SOURCE_FILES
 add_library(${TARGET_NAME} ${SOURCE_FILES})
 
 ######################################################################
+## luac
+######################################################################
+set(TARGET_NAME luac)
+
+include_directories(${LUA_PATH})
+add_executable(${TARGET_NAME} ${LUA_PATH}/luac.c)
+target_link_libraries(${TARGET_NAME} lua)
+######################################################################
 ## LuaBinaryTable library
 ######################################################################
 
@@ -74,6 +82,7 @@ include_directories(${LUA_PATH} src)
 
 add_executable(${TARGET_NAME} test/test.cpp)
 target_link_libraries(${TARGET_NAME} lua LuaBinaryTable)
+
 ######################################################################
 ## main
 ######################################################################
@@ -83,3 +92,5 @@ include_directories(${LUA_PATH} src)
 
 add_executable(${TARGET_NAME} test/main.cpp)
 target_link_libraries(${TARGET_NAME} lua LuaBinaryTable)
+
+install(TARGETS luac ltest luabt RUNTIME DESTINATION "bin")

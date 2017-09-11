@@ -23,11 +23,17 @@ static int LuaBinaryTable_parse(lua_State *L)
 
 static int LuaBinaryTable_write(lua_State *L)
 {
-    BinaryData *ret = writeBinaryTable(L, lua_gettop(L));
+    if(lua_gettop(L) != 1)
+    {
+        luaL_error(L, "1 argument expected, but %d was given", lua_gettop(L));
+    }
+    
+    BinaryData *ret = writeBinaryTable(L, 1);
     if(!ret)
     {
         return 0;
     }
+    
     lua_pushlstring(L, ret->data, ret->length);
     freeBinaryData(ret);
     return 1;

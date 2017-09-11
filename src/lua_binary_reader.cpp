@@ -6,7 +6,6 @@
 //  Copyright © 2015年 youlanhai. All rights reserved.
 //
 
-#include "lua_binary_types.h"
 #include "lua_binary_reader.h"
 
 extern "C"
@@ -38,11 +37,11 @@ namespace
             }
         }
         
-        bool getString(lua_State *L, int strIndex)
+        bool getString(lua_State *L, size_t strIndex)
         {
-            if(strIndex > 0 && strIndex <= size_)
+            if(strIndex <= size_)
             {
-                lua_rawgeti(L, handle_, strIndex);
+                lua_rawgeti(L, handle_, (int)strIndex);
                 return true;
             }
             return false;
@@ -50,11 +49,11 @@ namespace
         
         bool parse(lua_State *L, BinaryReader &reader)
         {
-            size_ = (int)reader.readNumber<TStringPoolLength>();
+            size_ = reader.readNumber<TStringPoolLength>();
             lua_createtable(L, size_, 0);
             handle_ = lua_gettop(L);
             
-            for(int i = 0; i < size_; ++i)
+            for(size_t i = 0; i < size_; ++i)
             {
                 size_t length = reader.readNumber<TStringLength>();
                 if(length == 0)
@@ -69,7 +68,7 @@ namespace
                 }
                 
                 lua_pushlstring(L, str, length);
-                lua_rawseti(L, -2, i + 1);
+                lua_rawseti(L, -2, (int)i + 1);
             }
             return true;
         }
@@ -79,7 +78,7 @@ namespace
         
     private:
         int      handle_;
-        int      size_;
+        size_t   size_;
     };
     
     typedef bool (*PARSE_FUN)(lua_State *L, StringTable &strTable, BinaryReader &reader);
@@ -121,39 +120,10 @@ namespace
         return true;
     }
     
-    bool _parseInt8(lua_State *L, StringTable &strTable, BinaryReader &reader)
+    template<typename T>
+    bool _parseNumber(lua_State *L, StringTable &strTable, BinaryReader &reader)
     {
-        lua_pushnumber(L, (lua_Number)reader.readNumber<int8_t>());
-        return true;
-    }
-        
-    bool _parseInt16(lua_State *L, StringTable &strTable, BinaryReader &reader)
-    {
-        lua_pushnumber(L, (lua_Number)reader.readNumber<int16_t>());
-        return true;
-    }
-        
-    bool _parseInt32(lua_State *L, StringTable &strTable, BinaryReader &reader)
-    {
-        lua_pushnumber(L, (lua_Number)reader.readNumber<int32_t>());
-        return true;
-    }
-        
-    bool _parseInt64(lua_State *L, StringTable &strTable, BinaryReader &reader)
-    {
-        lua_pushnumber(L, (lua_Number)reader.readNumber<int64_t>());
-        return true;
-    }
-        
-    bool _parseFloat(lua_State *L, StringTable &strTable, BinaryReader &reader)
-    {
-        lua_pushnumber(L, (lua_Number)reader.readNumber<float>());
-        return true;
-    }
-        
-    bool _parseDouble(lua_State *L, StringTable &strTable, BinaryReader &reader)
-    {
-        lua_pushnumber(L, (lua_Number)reader.readNumber<double>());
+        lua_pushnumber(L, (lua_Number)reader.readNumber<T>());
         return true;
     }
     
@@ -173,7 +143,7 @@ namespace
     bool _parseString(lua_State *L, StringTable &strTable, BinaryReader &reader)
     {
         size_t index = (size_t)reader.readNumber<T>();
-        if(!strTable.getString(L, (int)index))
+        if(!strTable.getString(L, index))
         {
             return false;
         }
@@ -220,12 +190,12 @@ namespace
         _parseFalse,
         _parseZero,
         _parseOne,
-        _parseInt8,
-        _parseInt16,
-        _parseInt32,
-        _parseInt64,
-        _parseFloat,
-        _parseDouble,
+        _parseNumber<int8_t>,
+        _parseNumber<int16_t>,
+        _parseNumber<int32_t>,
+        _parseNumber<int64_t>,
+        _parseNumber<float>,
+        _parseNumber<double>,
         _parseString0,
         _parseString<uint8_t>,
         _parseString<uint16_t>,
@@ -268,7 +238,5 @@ extern "C" int parseBinaryTable(lua_State *L, const char *data, size_t length)
     }
     
     strTable.destroy(L);
-    
-    int nReturns = lua_gettop(L) - top;
-    return nReturns;
+    return 1;
 }

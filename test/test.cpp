@@ -26,6 +26,53 @@ extern "C"
 
 #define DO_TEST(EXP) if(!(EXP)){std::cout << "Test Failed: " << #EXP << std::endl; abort(); }
 
+static int64_t getTimeMs()
+{
+    timeval val;
+    gettimeofday(&val, 0);
+    
+    return int64_t(val.tv_sec) * 1000 + val.tv_usec / 1000;
+}
+
+static bool readFile(std::string &data, const std::string &path)
+{
+    FILE *fp = fopen(path.c_str(), "rb");
+    if(fp == 0)
+    {
+        std::cout << "Failed to open file:" << path << std::endl;
+        return false;
+    }
+    
+    fseek(fp, 0, SEEK_END);
+    long length = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
+    
+    data.resize(length);
+    
+    if(length > 0)
+    {
+        fread(&data[0], length, 1, fp);
+    }
+    
+    fclose(fp);
+    return true;
+}
+
+static bool saveFile(const char *path, const char *data, size_t length)
+{
+    FILE *fp = fopen(path, "wb");
+    if(fp == 0)
+    {
+        std::cout << "Failed to open file:" << path << std::endl;
+        return false;
+    }
+    
+    fwrite(data, length, 1, fp);
+    fclose(fp);
+    return true;
+}
+
+
 void testReaderWriter()
 {
     std::cout << "testReaderWriter start..." << std::endl;
@@ -114,6 +161,7 @@ void testBinaryTable(lua_State *L)
     lua_pop(L, 1); // pop root table
     
     std::cout << "binary size:" << data->length << std::endl;
+#if 0
     std::cout << "binary data:";
     for(int i = 0; i < data->length; ++i)
     {
@@ -124,6 +172,9 @@ void testBinaryTable(lua_State *L)
         }
     }
     std::cout << std::endl;
+#else
+    saveFile("test.dat", data->data, data->length);
+#endif
     
     DO_TEST(1 == parseBinaryTable(L, data->data, data->length));
     
@@ -186,62 +237,35 @@ void testBinaryTable(lua_State *L)
     freeBinaryData(data);
 }
 
-int64_t getTimeMs()
+void testEfficiency(lua_State *L, const char *binaryTablePath, const char *luaBinaryPath)
 {
-    timeval val;
-    gettimeofday(&val, 0);
-    
-    return int64_t(val.tv_sec) * 1000 + val.tv_usec / 1000;
-}
+    std::cout << "Test Efficiency: " << binaryTablePath << " vs " << luaBinaryPath << std::endl;
 
-bool readFile(std::string &data, const std::string &path)
-{
-    FILE *p = fopen(path.c_str(), "rb");
-    if(p == 0)
-    {
-        std::cout << "Failed to open file:" << path << std::endl;
-        return false;
-    }
-    
-    const size_t BLOCK_SIZE = 1024;
-    long offset = 0;
-    bool end = false;
-    do
-    {
-        data.resize(offset + BLOCK_SIZE);
-        size_t n = fread(&data[offset], 1, BLOCK_SIZE, p);
-        if(n < BLOCK_SIZE)
-        {
-            end = true;
-            data.resize(offset + n);
-        }
-        offset += n;
-    }while(!end);
-    return true;
-}
-
-void testEfficiency(lua_State *L)
-{
-    const int nTestCase = 100;
-    
-    std::string path = "../../";
     std::string content;
-    if(!readFile(content, path + "d_skill.dat"))
+    const int nTestCase = 100;
+    int64_t start, end;
+    
+    // load binary table
+    if(!readFile(content, binaryTablePath))
     {
         return;
     }
     std::cout << "file size:" << content.size() << std::endl;
-
-    int64_t start = getTimeMs();
+    
+    // test parse binary table
+    start = getTimeMs();
     for(int i = 0; i < nTestCase; ++i)
     {
-        assert(1 == parseBinaryTable(L, content.data(), content.size()));
+        assert(1 == parseBinaryTable(L, content.c_str(), content.length()));
         lua_pop(L, 1);
     }
-    int64_t end = getTimeMs();
+    end = getTimeMs();
     std::cout << "parse binary use time: " << end - start << std::endl;
     
-    if(!readFile(content, path + "d_skill.luo"))
+    
+    
+    // load lua file
+    if(!readFile(content, luaBinaryPath))
     {
         return;
     }
@@ -251,16 +275,17 @@ void testEfficiency(lua_State *L)
     assert(lua_isfunction(L, -1));
     lua_pushlstring(L, content.data(), content.size());
     
+    // test load lua table
     start = getTimeMs();
     for(int i = 0; i < nTestCase; ++i)
     {
         lua_pushvalue(L, -2); // loadstring
         lua_pushvalue(L, -2); // content
         assert(0 == lua_pcall(L, 1, 1, 0)); //loadstring(content)
-        assert(lua_isfunction(L, -1));
+        assert(lua_isfunction(L, -1) && "Invalid input file");
         
         assert(0 == lua_pcall(L, 0, 1, 0)); // execute the chunk
-        assert(lua_istable(L, -1));
+        assert(lua_istable(L, -1) && "Invalid input file");
         
         lua_pop(L, 1);
     }
@@ -279,7 +304,14 @@ int main(int argc, char **argv)
     lua_call(L, 0, 0);
     
     testBinaryTable(L);
-    testEfficiency(L);
+    if(argc >= 3)
+    {
+        testEfficiency(L, argv[1], argv[2]);
+    }
+    else
+    {
+        std::cout << "usage : ltest path/to/binary/table path/to/lua/binary" << std::endl;
+    }
     
     lua_close(L);
     return 0;
