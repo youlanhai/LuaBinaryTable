@@ -59,6 +59,7 @@ static int LuaBinaryTable_parseFromFile(lua_State *L)
     
     int ret = parseBinaryTable(L, buffer, length);
     fclose(fp);
+    delete [] buffer;
     
     if(ret == 0)
     {
@@ -94,6 +95,7 @@ static int LuaBinaryTable_writeToFile(lua_State *L)
     
     fwrite(ret->data, ret->length, 1, fp);
     fclose(fp);
+    freeBinaryData(ret);
     
     lua_pushboolean(L, 1);
     return 1;

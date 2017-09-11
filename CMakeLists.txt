@@ -65,8 +65,8 @@ set(SOURCE_FILES
 	src/lua_binary_reader.cpp
 	src/lua_binary_table.h
 	src/lua_binary_table.cpp
-	src/lua_binary_writter.h
-	src/lua_binary_writter.cpp
+	src/lua_binary_writer.h
+	src/lua_binary_writer.cpp
 )
 
 include_directories(${LUA_PATH})

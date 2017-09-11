@@ -1,12 +1,12 @@
 //
-//  lua_binary_writter.cpp
+//  lua_binary_writer.cpp
 //  LuaBinaryTable
 //
 //  Created by youlanhai on 15/12/27.
 //  Copyright © 2015年 youlanhai. All rights reserved.
 //
 
-#include "lua_binary_writter.h"
+#include "lua_binary_writer.h"
 #include "lua_binary_table.h"
 
 #include <cstdlib>
@@ -376,7 +376,9 @@ extern "C" BinaryData* writeBinaryTable(lua_State*L, int idx)
     }
     
     BinaryWriter stream;
-    stream.reserve(strTable.getCacheSize() + dataWriter.size());
+    stream.reserve(4 + strTable.getCacheSize() + dataWriter.size());
+    stream.writeNumber((uint16_t)MAGIC_NUMBER);
+    stream.writeNumber((uint16_t)LUABT_VERSION);
     
     strTable.write(L, stream);
     strTable.destroy(L);

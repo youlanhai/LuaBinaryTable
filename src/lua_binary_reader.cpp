@@ -237,9 +237,26 @@ extern "C" int parseBinaryTable(lua_State *L, const char *data, size_t length)
 {
     int top = lua_gettop(L);
     
-    StringTable strTable;
     BinaryReader reader(data, length);
     
+    uint16_t magic, version;
+    reader.readNumber(magic);
+    if(magic != MAGIC_NUMBER)
+    {
+        lua_pushnil(L);
+        lua_pushfstring(L, "Invalid file format %x", magic);
+        return 2;
+    }
+    
+    reader.readNumber(version);
+    if(version != LUABT_VERSION)
+    {
+        lua_pushnil(L);
+        lua_pushfstring(L, "Invalid file version %d", version);
+        return 2;
+    }
+    
+    StringTable strTable;
     if(!strTable.parse(L, reader) ||
        !parserValue(L, strTable, reader))
     {

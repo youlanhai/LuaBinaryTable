@@ -16,7 +16,7 @@
 #include "lua_binary_table.h"
 
 #include "lua_binary_reader.h"
-#include "lua_binary_writter.h"
+#include "lua_binary_writer.h"
 
 extern "C"
 {

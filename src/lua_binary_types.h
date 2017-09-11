@@ -11,6 +11,8 @@
 
 #include <cstdint>
 
+#define LUABT_VERSION 1
+
 namespace LuaBinaryTable
 {
 
@@ -45,6 +47,8 @@ namespace LuaBinaryTable
 
     typedef uint16_t    TStringLength;
     typedef uint32_t    TStringPoolLength;
+
+    const uint16_t  MAGIC_NUMBER = 0x7462; // "bt"
 }
 
 

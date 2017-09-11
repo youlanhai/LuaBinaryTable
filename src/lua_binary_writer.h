@@ -1,13 +1,13 @@
 //
-//  lua_binary_writter.h
+//  lua_binary_writer.h
 //  LuaBinaryTable
 //
 //  Created by youlanhai on 15/12/27.
 //  Copyright © 2015年 youlanhai. All rights reserved.
 //
 
-#ifndef lua_binary_writter_h
-#define lua_binary_writter_h
+#ifndef lua_binary_writer_h
+#define lua_binary_writer_h
 
 #include "lua_binary_types.h"
 #include <cstring>
@@ -57,4 +57,4 @@ namespace LuaBinaryTable
     };
 }
 
-#endif /* lua_binary_writter_h */
+#endif /* lua_binary_writer_h */
