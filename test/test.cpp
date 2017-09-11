@@ -156,7 +156,7 @@ void testBinaryTable(lua_State *L)
     lua_rawseti(L, -2, 2);
     lua_setfield(L, -2, "array");
     
-    BinaryData *data = writeBinaryTable(L, 1);
+    BinaryData *data = writeBinaryTable(L, -1);
     assert(data);
     lua_pop(L, 1); // pop root table
     
@@ -249,7 +249,7 @@ void testEfficiency(lua_State *L, const char *binaryTablePath, const char *luaBi
     {
         return;
     }
-    std::cout << "file size:" << content.size() << std::endl;
+    std::cout << "file size: " << content.size() << std::endl;
     
     // test parse binary table
     start = getTimeMs();
@@ -272,7 +272,7 @@ void testEfficiency(lua_State *L, const char *binaryTablePath, const char *luaBi
     {
         return;
     }
-    std::cout << "file size:" << content.size() << std::endl;
+    std::cout << "file size: " << content.size() << std::endl;
     
     lua_getfield(L, LUA_GLOBALSINDEX, "loadstring");
     assert(lua_isfunction(L, -1));
@@ -295,7 +295,7 @@ void testEfficiency(lua_State *L, const char *binaryTablePath, const char *luaBi
         lua_pop(L, 1);
     }
     end = getTimeMs();
-    std::cout << "lua dostring use time:" << end - start << std::endl;
+    std::cout << "lua dostring use time: " << end - start << std::endl;
 }
 
 int main(int argc, char **argv)
