@@ -27,7 +27,7 @@ namespace LuaBinaryTable
     
     void BinaryWriter::destroy()
     {
-        free(data_);
+        std::free(data_);
         data_ = p_ = end_ = 0;
     }
     
@@ -62,69 +62,10 @@ namespace LuaBinaryTable
     }
 }
 
+using namespace LuaBinaryTable;
+
 namespace
 {
-    using namespace LuaBinaryTable;
-    
-    
-    void writeInteger(BinaryWriter &stream, int64_t value)
-    {
-        if(value < 0)
-        {
-            if(value >= std::numeric_limits<int8_t>::min())
-            {
-                stream.writeType(T_INT8);
-                stream.writeNumber((int8_t)value);
-            }
-            else if(value >= std::numeric_limits<int16_t>::min())
-            {
-                stream.writeType(T_INT16);
-                stream.writeNumber((int16_t)value);
-            }
-            else if(value >= std::numeric_limits<int32_t>::min())
-            {
-                stream.writeType(T_INT32);
-                stream.writeNumber((int32_t)value);
-            }
-            else
-            {
-                stream.writeType(T_INT64);
-                stream.writeNumber(value);
-            }
-        }
-        else
-        {
-            if(value == 0)
-            {
-                stream.writeType(T_ZERO);
-            }
-            else if(value == 1)
-            {
-                stream.writeType(T_ONE);
-            }
-            else if(value <= std::numeric_limits<int8_t>::max())
-            {
-                stream.writeType(T_INT8);
-                stream.writeNumber((int8_t)value);
-            }
-            else if(value <= std::numeric_limits<int16_t>::max())
-            {
-                stream.writeType(T_INT16);
-                stream.writeNumber((int16_t)value);
-            }
-            else if(value <= std::numeric_limits<int32_t>::max())
-            {
-                stream.writeType(T_INT32);
-                stream.writeNumber((int32_t)value);
-            }
-            else
-            {
-                stream.writeType(T_INT64);
-                stream.writeNumber(value);
-            }
-        }
-    }
-    
     class StringTable
     {
     public:
@@ -201,148 +142,217 @@ namespace
         size_t  size_;
         size_t  cacheSize_;
     };
-    
-    void writeFloat(BinaryWriter &stream, double value)
+}
+
+static bool writeValue(lua_State *L, int index, StringTable &strTable, BinaryWriter &stream);
+
+static void writeInteger(BinaryWriter &stream, int64_t value)
+{
+    if(value == 0)
     {
-        stream.writeType(T_DOUBLE);
-        stream.writeNumber(value);
+        stream.writeType(T_ZERO);
     }
-    
-    size_t countTableLength(lua_State *L, int index)
+    else if(value == 1)
     {
-        int idx = index > 0 ? index : index - 1;
-        size_t n = 0;
-        lua_pushnil(L);
-        while(lua_next(L, idx) != 0)
-        {
-            lua_pop(L, 1); // pop the value.
-            ++n;
-        }
-        return n;
+        stream.writeType(T_ONE);
     }
-    
-    void writeLength(BinaryWriter &stream, Type type0, size_t length)
+    else if(value < 0)
     {
-        if(length == 0)
+        if(value >= std::numeric_limits<int8_t>::min())
         {
-            stream.writeType(type0);
+            stream.writeType(T_INT8);
+            stream.writeNumber((int8_t)value);
         }
-        else if(length < std::numeric_limits<uint8_t>::min())
+        else if(value >= std::numeric_limits<int16_t>::min())
         {
-            stream.writeType(Type(type0 + 1));
-            stream.writeNumber((uint8_t)length);
+            stream.writeType(T_INT16);
+            stream.writeNumber((int16_t)value);
         }
-        else if(length < std::numeric_limits<uint16_t>::min())
+        else if(value >= std::numeric_limits<int32_t>::min())
         {
-            stream.writeType(Type(type0 + 2));
-            stream.writeNumber((uint16_t)length);
+            stream.writeType(T_INT32);
+            stream.writeNumber((int32_t)value);
         }
         else
         {
-            stream.writeType(Type(type0 + 3));
-            stream.writeNumber((uint32_t)length);
+            stream.writeType(T_INT64);
+            stream.writeNumber(value);
         }
     }
-    
-    bool writeValue(lua_State *L, int index, StringTable &strTable, BinaryWriter &stream)
+    else
     {
-        int type = lua_type(L, index);
-        switch (type)
+        if(value <= std::numeric_limits<int8_t>::max())
         {
-            case LUA_TNIL:
-            {
-                stream.writeType(T_NIL);
-                break;
-            }
-                
-            case LUA_TBOOLEAN:
-            {
-                if(lua_toboolean(L, index))
-                {
-                    stream.writeType(T_TRUE);
-                }
-                else
-                {
-                    stream.writeType(T_FALSE);
-                }
-                break;
-            }
-                
-            case LUA_TNUMBER:
-            {
-                lua_Number v = lua_tonumber(L, index);
-                lua_Number nearV = round(v);
-                
-                if(v == nearV)
-                {
-                    writeInteger(stream, (int64_t)nearV);
-                }
-                else
-                {
-                    writeFloat(stream, v);
-                }
-                break;
-            }
-            case LUA_TSTRING:
-            {
-                if(lua_strlen(L, index) == 0)
-                {
-                    stream.writeType(T_STRING0);
-                }
-                else
-                {
-                    size_t strIndex = strTable.storeString(L, index);
-                    assert(strIndex != 0);
-                    writeLength(stream, T_STRING0, strIndex);
-                }
-                break;
-            }
-            case LUA_TTABLE:
-            {
-                size_t length = countTableLength(L, index);
-                if(length == 0)
-                {
-                    stream.writeType(T_TABLE0);
-                }
-                else if(length == lua_objlen(L, index))
-                {
-                    // the table is an array.
-                    writeLength(stream, T_ARRAY0, length);
-                    for(size_t i = 1; i <= length; ++i)
-                    {
-                        lua_rawgeti(L, index, (int)i);
-                        if(!writeValue(L, -1, strTable, stream))
-                        {
-                            return false;
-                        }
-                        lua_pop(L, 1);
-                    }
-                }
-                else
-                {
-                    // the table is a hash table.
-                    writeLength(stream, T_TABLE0, length);
-                    
-                    int idx = index > 0 ? index : index - 1;
-                    lua_pushnil(L);
-                    while(lua_next(L, idx) != 0)
-                    {
-                        if(!writeValue(L, -2, strTable, stream) ||
-                           !writeValue(L, -1, strTable, stream))
-                        {
-                            return false;
-                        }
-                        lua_pop(L, 1); // pop the value
-                    }
-                }
-                break;
-            }
-                
-            default:
-                return false;
+            stream.writeType(T_INT8);
+            stream.writeNumber((int8_t)value);
         }
-        return true;
+        else if(value <= std::numeric_limits<int16_t>::max())
+        {
+            stream.writeType(T_INT16);
+            stream.writeNumber((int16_t)value);
+        }
+        else if(value <= std::numeric_limits<int32_t>::max())
+        {
+            stream.writeType(T_INT32);
+            stream.writeNumber((int32_t)value);
+        }
+        else
+        {
+            stream.writeType(T_INT64);
+            stream.writeNumber(value);
+        }
     }
+}
+
+static void writeFloat(BinaryWriter &stream, double value)
+{
+    stream.writeType(T_DOUBLE);
+    stream.writeNumber(value);
+}
+
+static void writeLength(BinaryWriter &stream, Type type0, size_t length)
+{
+    if(length == 0)
+    {
+        stream.writeType(type0);
+    }
+    else if(length < std::numeric_limits<uint8_t>::min())
+    {
+        stream.writeType(Type(type0 + 1));
+        stream.writeNumber((uint8_t)length);
+    }
+    else if(length < std::numeric_limits<uint16_t>::min())
+    {
+        stream.writeType(Type(type0 + 2));
+        stream.writeNumber((uint16_t)length);
+    }
+    else
+    {
+        stream.writeType(Type(type0 + 3));
+        stream.writeNumber((uint32_t)length);
+    }
+}
+
+static size_t countTableLength(lua_State *L, int index)
+{
+    int idx = index > 0 ? index : index - 1;
+    size_t n = 0;
+    lua_pushnil(L);
+    while(lua_next(L, idx) != 0)
+    {
+        lua_pop(L, 1); // pop the value.
+        ++n;
+    }
+    return n;
+}
+
+static bool writeTable(lua_State *L, int index, StringTable &strTable, BinaryWriter &stream)
+{
+    size_t length = countTableLength(L, index);
+    if(length == 0)
+    {
+        stream.writeType(T_TABLE0);
+    }
+    else if(length == lua_objlen(L, index))
+    {
+        // the table is an array.
+        writeLength(stream, T_ARRAY0, length);
+        for(size_t i = 1; i <= length; ++i)
+        {
+            lua_rawgeti(L, index, (int)i);
+            if(!writeValue(L, -1, strTable, stream))
+            {
+                return false;
+            }
+            lua_pop(L, 1);
+        }
+    }
+    else
+    {
+        // the table is a hash table.
+        writeLength(stream, T_TABLE0, length);
+        
+        int idx = index > 0 ? index : index - 1;
+        lua_pushnil(L);
+        while(lua_next(L, idx) != 0)
+        {
+            if(!writeValue(L, -2, strTable, stream) ||
+               !writeValue(L, -1, strTable, stream))
+            {
+                return false;
+            }
+            lua_pop(L, 1); // pop the value
+        }
+    }
+    return true;
+}
+
+static bool writeValue(lua_State *L, int index, StringTable &strTable, BinaryWriter &stream)
+{
+    int type = lua_type(L, index);
+    switch (type)
+    {
+        case LUA_TNIL:
+        {
+            stream.writeType(T_NIL);
+            break;
+        }
+            
+        case LUA_TBOOLEAN:
+        {
+            if(lua_toboolean(L, index))
+            {
+                stream.writeType(T_TRUE);
+            }
+            else
+            {
+                stream.writeType(T_FALSE);
+            }
+            break;
+        }
+            
+        case LUA_TNUMBER:
+        {
+            lua_Number v = lua_tonumber(L, index);
+            lua_Number nearV = round(v);
+            
+            if(v == nearV)
+            {
+                writeInteger(stream, (int64_t)nearV);
+            }
+            else
+            {
+                writeFloat(stream, v);
+            }
+            break;
+        }
+        case LUA_TSTRING:
+        {
+            if(lua_strlen(L, index) == 0)
+            {
+                stream.writeType(T_STRING0);
+            }
+            else
+            {
+                size_t strIndex = strTable.storeString(L, index);
+                assert(strIndex != 0);
+                writeLength(stream, T_STRING0, strIndex);
+            }
+            break;
+        }
+        case LUA_TTABLE:
+        {
+            if(!writeTable(L, index, strTable, stream))
+            {
+                return false;
+            }
+            break;
+        }
+            
+        default:
+            return false;
+    }
+    return true;
 }
 
 extern "C" BinaryData* writeBinaryTable(lua_State*L, int idx)
@@ -383,6 +393,6 @@ extern "C" BinaryData* writeBinaryTable(lua_State*L, int idx)
 
 extern "C" void freeBinaryData(BinaryData *p)
 {
-    free(p->data);
+    std::free(p->data);
     delete p;
 }

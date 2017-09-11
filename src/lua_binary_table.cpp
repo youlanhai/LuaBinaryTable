@@ -74,7 +74,7 @@ static int LuaBinaryTable_writeToFile(lua_State *L)
 {
     const char *filename = luaL_checkstring(L, 1);
     
-    BinaryData *ret = writeBinaryTable(L, -1);
+    BinaryData *ret = writeBinaryTable(L, 2);
     if(!ret)
     {
         lua_pushboolean(L, 0);
