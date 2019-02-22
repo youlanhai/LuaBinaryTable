@@ -72,7 +72,6 @@ static bool saveFile(const char *path, const char *data, size_t length)
     return true;
 }
 
-
 void testReaderWriter()
 {
     std::cout << "testReaderWriter start..." << std::endl;

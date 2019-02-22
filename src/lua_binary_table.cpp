@@ -101,11 +101,59 @@ static int LuaBinaryTable_writeToFile(lua_State *L)
     return 1;
 }
 
+static int LuaBinaryTable_dump(lua_State *L)
+{
+    if(lua_gettop(L) < 1)
+    {
+        luaL_error(L, "expected 1 argument, but 0 was givent.");
+    }
+    int maxIndent = 99;
+    if(lua_gettop(L) >= 2)
+    {
+        maxIndent = luaL_checkint(L, 2);
+    }
+    
+    BinaryData *ret = dumpTable(L, 1, maxIndent);
+    lua_pushlstring(L, ret->data, ret->length);
+    freeBinaryData(ret);
+    return 1;
+}
+
+static int LuaBinaryTable_dumpToFile(lua_State *L)
+{
+    const char *filename = luaL_checkstring(L, 2);
+    int maxIndent = 99;
+    if(lua_gettop(L) >= 3)
+    {
+        maxIndent = luaL_checkint(L, 3);
+    }
+    
+    BinaryData *ret = dumpTable(L, 1, maxIndent);
+    FILE *fp = fopen(filename, "wb");
+    if(!fp)
+    {
+        freeBinaryData(ret);
+        
+        lua_pushboolean(L, 0);
+        lua_pushstring(L, "Failed open input file.");
+        return 2;
+    }
+    
+    fwrite(ret->data, ret->length, 1, fp);
+    fclose(fp);
+    freeBinaryData(ret);
+    
+    lua_pushboolean(L, 1);
+    return 1;
+}
+
 static const luaL_Reg binaryTableLib[] = {
     {"parse", LuaBinaryTable_parse},
     {"write", LuaBinaryTable_write},
     {"parseFromFile", LuaBinaryTable_parseFromFile},
     {"writeToFile", LuaBinaryTable_writeToFile},
+    {"dump", LuaBinaryTable_dump},
+    {"dumpToFile", LuaBinaryTable_dumpToFile},
     {0, 0},
 };
 

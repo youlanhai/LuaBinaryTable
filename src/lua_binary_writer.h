@@ -38,6 +38,12 @@ namespace LuaBinaryTable
             p_ += sizeof(T);
         }
         
+        void writeChar(char ch)
+        {
+            ensure(1);
+            *p_++ = ch;
+        }
+        
         void writeBytes(const char *data, size_t length)
         {
             ensure(length);
@@ -45,9 +51,26 @@ namespace LuaBinaryTable
             p_ += length;
         }
         
+        void writeString(const char *str)
+        {
+            writeBytes(str, strlen(str));
+        }
+        
         void writeType(Type type)
         {
             writeNumber((uint8_t)type);
+        }
+        
+        void writeIndent(int n)
+        {
+            if(n > 0)
+            {
+                ensure(n);
+                for(int i = 0; i < n; ++i)
+                {
+                    *p_++ = '\t';
+                }
+            }
         }
         
     private:

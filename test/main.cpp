@@ -44,7 +44,7 @@ int compressFile(lua_State *L, const std::string &srcFile, const std::string &ds
     if(0 != lua_pcall(L, 1, 1, 0))
     {
         std::cout << "Failed to excute lua file:" << srcFile << "\n"
-        << "error:" << lua_tostring(L, -1) << std::endl;
+            << "error:" << lua_tostring(L, -1) << std::endl;
         lua_pop(L, 1);
         return 0;
     }
@@ -60,6 +60,7 @@ int compressFile(lua_State *L, const std::string &srcFile, const std::string &ds
     FILE *file = fopen(dstFile.c_str(), "wb");
     if(file == 0)
     {
+        freeBinaryData(data);
         std::cout << "Failed to create file:" << dstFile << std::endl;
         return 0;
     }
@@ -71,8 +72,28 @@ int compressFile(lua_State *L, const std::string &srcFile, const std::string &ds
     return 0;
 }
 
-int decompressFile()
+int decompressFile(lua_State *L, const std::string &srcFile, const std::string &dstFile)
 {
+    lua_getglobal(L, "BinaryTable");
+    lua_getfield(L, -1, "dumpToFile");
+    lua_getfield(L, -2, "parseFromFile");
+    lua_pushlstring(L, srcFile.c_str(), srcFile.size());
+    if(0 != lua_pcall(L, 1, 1, 0))
+    {
+        std::cout << "Failed to excute function 'parseFromFile':" << srcFile << "\n"
+            << "error:" << lua_tostring(L, -1) << std::endl;
+        lua_pop(L, 1);
+        return 0;
+    }
+    
+    lua_pushlstring(L, dstFile.c_str(), dstFile.size());
+    if(0 != lua_pcall(L, 2, 0, 0))
+    {
+        std::cout << "Failed to excute function 'dumpToFile':" << srcFile << "\n"
+        << "error:" << lua_tostring(L, -1) << std::endl;
+        lua_pop(L, 1);
+        return 0;
+    }
     return 0;
 }
 
@@ -139,6 +160,8 @@ int main(int argc, char **argv)
     
     lua_State *L = lua_open();
     luaL_openlibs(L);
+    lua_pushcfunction(L, luaopen_BinaryTable);
+    lua_pcall(L, 0, 0, 0);
     
     int ret = 0;
     if(compress)
@@ -147,7 +170,7 @@ int main(int argc, char **argv)
     }
     else
     {
-        ret = decompressFile();
+        ret = decompressFile(L, srcFile, dstFile);
     }
     
     lua_close(L);

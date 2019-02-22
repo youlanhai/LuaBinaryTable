@@ -224,7 +224,7 @@ static PARSE_FUN parsers[T_MAX] = {
 static bool parserValue(lua_State *L, StringTable &strTable, BinaryReader &reader)
 {
     assert(parsers[T_MAX - 1] != 0);
-    uint8_t type = reader.readNumber<uint8_t>();
+    Type type = reader.readType();
     if(type >= T_MAX)
     {
         return false;
