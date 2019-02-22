@@ -261,7 +261,9 @@ extern "C" int parseBinaryTable(lua_State *L, const char *data, size_t length)
        !parserValue(L, strTable, reader))
     {
         lua_settop(L, top);
-        return 0;
+        lua_pushnil(L);
+        lua_pushfstring(L, "Parse failed.");
+        return 2;
     }
     
     strTable.destroy(L);

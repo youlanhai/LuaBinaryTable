@@ -12,8 +12,9 @@
 #include <cstdlib>
 #include <algorithm>
 #include <cmath>
-#include <climits>
+#include <limits>
 #include <cassert>
+#include <cstdio>
 
 namespace LuaBinaryTable
 {
@@ -37,7 +38,7 @@ namespace LuaBinaryTable
         {
             size_t size = this->size();
             
-            if(data_ != nullptr)
+            if(data_ != NULL)
             {
                 data_ = (char*)std::realloc(data_, capacity);
             }
@@ -535,7 +536,7 @@ static void dumpValue(lua_State *L, int idx, BinaryWriter &stream, int indent, i
                 // get key
                 lua_rawgeti(L, -1, i);
                 stream.writeChar('[');
-                dumpValue(L, -2, stream, 1, 0);
+                dumpValue(L, -1, stream, 1, 0);
                 stream.writeString("] = ");
                 
                 // get value. key will be poped automatically

@@ -9,7 +9,7 @@
 #ifndef lua_binary_types_h
 #define lua_binary_types_h
 
-#include <cstdint>
+#include <stdint.h>
 
 #define LUABT_VERSION 1
 
